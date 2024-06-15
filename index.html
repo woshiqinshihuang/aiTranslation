@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI翻译</title>
+    <link href="./css/tailwind.min.css" rel="stylesheet">
+    <link href="./css/index.css" rel="stylesheet">
+    <script src="./js/fetch-stream.js"></script>
+    <script src="./js/window-read.js"></script>
+    <script src="./js/toast.js"></script>
+</head>
+
+<body class="bg-gray-100 p-4">
+    <div class="container mx-auto">
+        <div class="flex">
+            <div class="w-2/3 pr-2">
+                <div class="relative p-2 pb-12 mb-2 bg-white border border-gray-300 rounded-md shadow-sm">
+                    <textarea id="input"
+                        class="w-full h-60 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                        placeholder="输入文本"></textarea>
+                    <button class="play-btn absolute bottom-2 right-2 text-white px-2 py-2 rounded-md">
+                        <svg t="1718428685976" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                            xmlns="http://www.w3.org/2000/svg" p-id="4433" width="20" height="20">
+                            <path
+                                d="M640 101.632v629.952l-85.333333-42.666667V239.68L266.069333 384H128v256h138.069333l98.858667 49.450667L640 826.986667v95.381333L245.952 725.333333H42.666667V298.666667h203.242666L640 101.632z m272.938667 140.245333a385.706667 385.706667 0 0 1 43.669333 52.778667A382.378667 382.378667 0 0 1 1024 512c0 78.656-23.744 153.877333-67.392 217.344a385.6 385.6 0 0 1-35.754667 44.522667l-7.914666 8.256-60.650667-60.032a300.373333 300.373333 0 0 0 34.005333-41.088A297.045333 297.045333 0 0 0 938.666667 512a297.045333 297.045333 0 0 0-78.997334-202.368l-7.381333-7.722667 60.650667-60.032z m-121.301334 120.064A212.522667 212.522667 0 0 1 853.333333 512a212.522667 212.522667 0 0 1-56.448 144.554667l-5.248 5.504-60.650666-60.032A127.189333 127.189333 0 0 0 768 512a127.189333 127.189333 0 0 0-33.066667-85.866667l-3.946666-4.16 60.650666-60.032z"
+                                fill="#333333" p-id="4434"></path>
+                        </svg>
+                    </button>
+                    <button class="copy-btn absolute bottom-2 right-12 text-white px-2 py-2 rounded-md">
+                        <svg t="1718428823486" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                            xmlns="http://www.w3.org/2000/svg" p-id="5448" width="20" height="20">
+                            <path d="M96.1 575.7a32.2 32.1 0 1 0 64.4 0 32.2 32.1 0 1 0-64.4 0Z" fill="#4D4D4D"
+                                p-id="5449"></path>
+                            <path
+                                d="M742.1 450.7l-269.5-2.1c-14.3-0.1-26 13.8-26 31s11.7 31.3 26 31.4l269.5 2.1c14.3 0.1 26-13.8 26-31s-11.7-31.3-26-31.4zM742.1 577.7l-269.5-2.1c-14.3-0.1-26 13.8-26 31s11.7 31.3 26 31.4l269.5 2.1c14.3 0.2 26-13.8 26-31s-11.7-31.3-26-31.4z"
+                                fill="#4D4D4D" p-id="5450"></path>
+                            <path
+                                d="M736.1 63.9H417c-70.4 0-128 57.6-128 128h-64.9c-70.4 0-128 57.6-128 128v128c-0.1 17.7 14.4 32 32.2 32 17.8 0 32.2-14.4 32.2-32.1V320c0-35.2 28.8-64 64-64H289v447.8c0 70.4 57.6 128 128 128h255.1c-0.1 35.2-28.8 63.8-64 63.8H224.5c-35.2 0-64-28.8-64-64V703.5c0-17.7-14.4-32.1-32.2-32.1-17.8 0-32.3 14.4-32.3 32.1v128.3c0 70.4 57.6 128 128 128h384.1c70.4 0 128-57.6 128-128h65c70.4 0 128-57.6 128-128V255.9l-193-192z m0.1 63.4l127.7 128.3H800c-35.2 0-64-28.8-64-64v-64.3h0.2z m64 641H416.1c-35.2 0-64-28.8-64-64v-513c0-35.2 28.8-64 64-64H671V191c0 70.4 57.6 128 128 128h65.2v385.3c0 35.2-28.8 64-64 64z"
+                                fill="#4D4D4D" p-id="5451"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="relative p-2 pb-12 bg-white border border-gray-300 rounded-md shadow-sm">
+                    <textarea id="output"
+                        class="w-full h-60 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                        placeholder="翻译结果" disabled></textarea>
+                    <button class="play-btn absolute bottom-2 right-2 text-white px-2 py-2 rounded-md">
+                        <svg t="1718428685976" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                            xmlns="http://www.w3.org/2000/svg" p-id="4433" width="20" height="20">
+                            <path
+                                d="M640 101.632v629.952l-85.333333-42.666667V239.68L266.069333 384H128v256h138.069333l98.858667 49.450667L640 826.986667v95.381333L245.952 725.333333H42.666667V298.666667h203.242666L640 101.632z m272.938667 140.245333a385.706667 385.706667 0 0 1 43.669333 52.778667A382.378667 382.378667 0 0 1 1024 512c0 78.656-23.744 153.877333-67.392 217.344a385.6 385.6 0 0 1-35.754667 44.522667l-7.914666 8.256-60.650667-60.032a300.373333 300.373333 0 0 0 34.005333-41.088A297.045333 297.045333 0 0 0 938.666667 512a297.045333 297.045333 0 0 0-78.997334-202.368l-7.381333-7.722667 60.650667-60.032z m-121.301334 120.064A212.522667 212.522667 0 0 1 853.333333 512a212.522667 212.522667 0 0 1-56.448 144.554667l-5.248 5.504-60.650666-60.032A127.189333 127.189333 0 0 0 768 512a127.189333 127.189333 0 0 0-33.066667-85.866667l-3.946666-4.16 60.650666-60.032z"
+                                fill="#333333" p-id="4434"></path>
+                        </svg>
+                    </button>
+                    <button class="copy-btn absolute bottom-2 right-12 text-white px-2 py-2 rounded-md">
+                        <svg t="1718428823486" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                            xmlns="http://www.w3.org/2000/svg" p-id="5448" width="20" height="20">
+                            <path d="M96.1 575.7a32.2 32.1 0 1 0 64.4 0 32.2 32.1 0 1 0-64.4 0Z" fill="#4D4D4D"
+                                p-id="5449"></path>
+                            <path
+                                d="M742.1 450.7l-269.5-2.1c-14.3-0.1-26 13.8-26 31s11.7 31.3 26 31.4l269.5 2.1c14.3 0.1 26-13.8 26-31s-11.7-31.3-26-31.4zM742.1 577.7l-269.5-2.1c-14.3-0.1-26 13.8-26 31s11.7 31.3 26 31.4l269.5 2.1c14.3 0.2 26-13.8 26-31s-11.7-31.3-26-31.4z"
+                                fill="#4D4D4D" p-id="5450"></path>
+                            <path
+                                d="M736.1 63.9H417c-70.4 0-128 57.6-128 128h-64.9c-70.4 0-128 57.6-128 128v128c-0.1 17.7 14.4 32 32.2 32 17.8 0 32.2-14.4 32.2-32.1V320c0-35.2 28.8-64 64-64H289v447.8c0 70.4 57.6 128 128 128h255.1c-0.1 35.2-28.8 63.8-64 63.8H224.5c-35.2 0-64-28.8-64-64V703.5c0-17.7-14.4-32.1-32.2-32.1-17.8 0-32.3 14.4-32.3 32.1v128.3c0 70.4 57.6 128 128 128h384.1c70.4 0 128-57.6 128-128h65c70.4 0 128-57.6 128-128V255.9l-193-192z m0.1 63.4l127.7 128.3H800c-35.2 0-64-28.8-64-64v-64.3h0.2z m64 641H416.1c-35.2 0-64-28.8-64-64v-513c0-35.2 28.8-64 64-64H671V191c0 70.4 57.6 128 128 128h65.2v385.3c0 35.2-28.8 64-64 64z"
+                                fill="#4D4D4D" p-id="5451"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="w-1/3 pl-2">
+                <label for="from_lang" class="block text-sm font-medium text-gray-700">源语言</label>
+                <select id="from_lang"
+                    class="w-full p-2 mt-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    <option value="en">English (🇬🇧)</option>
+                    <option value="zh">中文 (🇨🇳)</option>
+                    <option value="es">Español (🇪🇸)</option>
+                    <option value="fr">Français (🇫🇷)</option>
+                    <option value="ar">العربية (🇸🇦)</option>
+                    <option value="ru">Русский (🇷🇺)</option>
+                    <option value="de">Deutsch (🇩🇪)</option>
+                    <option value="ja">日本語 (🇯🇵)</option>
+                    <option value="pt">Português (🇵🇹)</option>
+                    <option value="it">Italiano (🇮🇹)</option>
+                    <option value="hi">हिन्दी (🇮🇳)</option>
+                    <option value="ko">한국어 (🇰🇷)</option>
+                    <option value="nl">Nederlands (🇳🇱)</option>
+                    <option value="pl">Polski (🇵🇱)</option>
+                    <option value="tr">Türkçe (🇹🇷)</option>
+                    <option value="sv">Svenska (🇸🇪)</option>
+                    <option value="id">Bahasa Indonesia (🇮🇩)</option>
+                    <option value="vi">Tiếng Việt (🇻🇳)</option>
+                </select>
+                <label for="to_lang" class="block text-sm font-medium text-gray-700 mt-2">目标语言</label>
+                <select id="to_lang"
+                    class="w-full p-2 mt-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    <option value="en">English (🇬🇧)</option>
+                    <option value="zh">中文 (🇨🇳)</option>
+                    <option value="es">Español (🇪🇸)</option>
+                    <option value="fr">Français (🇫🇷)</option>
+                    <option value="ar">العربية (🇸🇦)</option>
+                    <option value="ru">Русский (🇷🇺)</option>
+                    <option value="de">Deutsch (🇩🇪)</option>
+                    <option value="ja">日本語 (🇯🇵)</option>
+                    <option value="pt">Português (🇵🇹)</option>
+                    <option value="it">Italiano (🇮🇹)</option>
+                    <option value="hi">हिन्दी (🇮🇳)</option>
+                    <option value="ko">한국어 (🇰🇷)</option>
+                    <option value="nl">Nederlands (🇳🇱)</option>
+                    <option value="pl">Polski (🇵🇱)</option>
+                    <option value="tr">Türkçe (🇹🇷)</option>
+                    <option value="sv">Svenska (🇸🇪)</option>
+                    <option value="id">Bahasa Indonesia (🇮🇩)</option>
+                    <option value="vi">Tiếng Việt (🇻🇳)</option>
+                </select>
+                <label for="api" class="block text-sm font-medium text-gray-700 mt-2">API地址</label>
+                <input id="api" value="https://api.openai.com"
+                    class="w-full p-2 mt-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                    placeholder="请输入OpenAI地址">
+                </input>
+                <label for="key" class="block text-sm font-medium text-gray-700 mt-2">Key</label>
+                <input id="key"
+                    class="w-full p-2 mt-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                    placeholder="请输入OpenAI Key">
+                </input>
+                <label for="model" class="block text-sm font-medium text-gray-700 mt-2">模型</label>
+                <select id="model"
+                    class="w-full p-2 mt-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
+                    <option value="gpt-4-turbo">gpt-4-turbo</option>
+                    <option value="deepseek-chat">deepseek-chat</option>
+                    <option value="deepseek-code">deepseek-code</option>
+                </select>
+                <label for="is_stream" class="block text-sm font-medium text-gray-700 mt-2">是否流式输出(Stream)</label>
+                <select id="is_stream"
+                    class="w-full p-2 mt-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    <option value=true>是</option>
+                    <option value=flase>否</option>
+                </select>
+                <label for="random_value"
+                    class="block text-sm font-medium text-gray-700 mt-2">随机值(随机值越高，结果越有创意。)</label>
+                <select id="random_value"
+                    class="w-full p-2 mt-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    <option value=0.5>0.5</option>
+                    <option value=0.6>0.6</option>
+                    <option value=0.7 selected>0.7</option>
+                    <option value=0.8>0.8</option>
+                    <option value=0.9>0.9</option>
+                    <option value=1.0>1.0</option>
+                </select>
+                <button id="translate"
+                    class="mt-4 w-full p-2 bg-indigo-500 text-white rounded-md shadow-sm hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">翻译</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="./js/local-record.js"></script>
+    <script src="./js/click.js"></script>
+</body>
+
+</html>
